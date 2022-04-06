@@ -1,4 +1,4 @@
-﻿namespace ElectricityMeterLibrary;
+﻿namespace EnergyConsumptionLibrary;
 public enum Intervals
 {
     PerMonth,

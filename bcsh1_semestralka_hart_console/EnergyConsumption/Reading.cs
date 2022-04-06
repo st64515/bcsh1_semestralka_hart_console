@@ -1,4 +1,4 @@
-﻿namespace ElectricityMeterLibrary;
+﻿namespace EnergyConsumptionLibrary;
 public class Reading
 {
     public int StateOfGauge { get; init; }

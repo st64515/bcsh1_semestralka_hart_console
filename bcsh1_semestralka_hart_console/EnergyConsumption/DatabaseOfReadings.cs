@@ -1,9 +1,14 @@
-﻿namespace ElectricityMeterLibrary;
+﻿namespace EnergyConsumptionLibrary;
+/// <summary>
+/// Třída je databází odečtů. Do třídy jdou uložit pouze takové odečty,
+/// které davájí vzhledem k času a stavu hodin smysl.
+/// Záznamy jsou uloženy chronologicky.
+/// </summary>
 public class DatabaseOfReadings
 {
     public int StateOfGauge { get; set; }
     public DateOnly LastReading { get; set; }
-    public int NumberOfReadings => readings_list.Count;
+    public int Count => readings_list.Count;
     private readonly List<Reading> readings_list = new();
 
     public DatabaseOfReadings(DateOnly dateOfFirstReading, int stateOfGauge)

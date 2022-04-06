@@ -1,11 +1,11 @@
-﻿namespace ElectricityMeterLibrary;
+﻿namespace EnergyConsumptionLibrary;
 public class PriceTag : IComparable<PriceTag>
 {
     public DateOnly StartDate { get; init; }
     public DateOnly EndDate { get; init; }
-    public int Price { get; init; }
+    public double Price { get; init; }
 
-    public PriceTag(DateOnly startDate, DateOnly endDate, int price)
+    public PriceTag(DateOnly startDate, DateOnly endDate, double price)
     {
         StartDate = startDate;
         EndDate = endDate;
@@ -26,5 +26,9 @@ public class PriceTag : IComparable<PriceTag>
                 return x.CompareTo(y);
             }
         }
+    }
+    new public string ToString()
+    {
+        return $"- od {StartDate} do {EndDate}: {Price}Kč/kWh";
     }
 }

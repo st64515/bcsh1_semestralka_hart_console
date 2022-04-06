@@ -1,17 +1,19 @@
-﻿namespace ElectricityMeterLibrary;
+﻿namespace EnergyConsumptionLibrary;
 using System.Text;
-internal class ElectricityMeter
+public class Meter
 {
     private readonly DatabaseOfReadings readings;
     private readonly DatabaseOfPrices prices;
     private readonly DatabaseOfTaxes taxes;
+
+    private EnergyConsumptionValidator validator = new();
 
     int StateOfGauge => readings.StateOfGauge;
     DateOnly LastReading => readings.LastReading;
 
 
 
-    public ElectricityMeter(DateOnly dateOfFirstReading, int StartingStateOfGauge)
+    public Meter(DateOnly dateOfFirstReading, int StartingStateOfGauge)
     {
         readings = new(dateOfFirstReading, StartingStateOfGauge);
         prices = new();
@@ -26,8 +28,9 @@ internal class ElectricityMeter
     /// <param name="dateOfReading">Datum odečtu.</param>
     /// <param name="actualStateOfGauge">Stav hodin při odečtu.</param>
     /// <exception cref="ArgumentException">Vyvolá výjimku, pokud zadané parametry nejsou validní nebo není pro zadané období nastavena cena.</exception>
-    internal void AddReading(DateOnly dateOfReading, int actualStateOfGauge)
+    public void AddReading(DateOnly dateOfReading, int actualStateOfGauge)
     {
+
         //Pokud je zadaný stav elektroměru nižší než předtím, vyhoď výjimku.
         if (actualStateOfGauge <= StateOfGauge)
         {
@@ -41,11 +44,11 @@ internal class ElectricityMeter
                 "Inserted date of reading must be higher than last.");
         }
         //Pokud pro zadané období neexistuje cena, vyhoď výjimku
-        if (!prices.ExistsPriceBetween(LastReading, dateOfReading))
+        if (!validator.ExistsPriceBetween(prices, LastReading, dateOfReading))
         {
             throw new ArgumentException(
                 $"There is not set any price for some day in a given period." +
-                $"There is problem with a price in day {prices.DayWithNoPrice}.");
+                $"There is problem with a price in day {validator.Message}.");
         }
         readings.Add(dateOfReading, actualStateOfGauge);
     }
@@ -55,9 +58,20 @@ internal class ElectricityMeter
     /// <param name="dateStart">Počáteční datum cenovky.</param>
     /// <param name="dateEnd">Expirační datum cenovky.</param>
     /// <param name="price">Cena za kWh.</param>
-    internal void AddElectricityPrice(DateOnly dateStart, DateOnly dateEnd, int price)
+    public void AddElectricityPrice(DateOnly dateStart, DateOnly dateEnd, int price)
     {
         prices.Add(dateStart, dateEnd, price);
+    }
+
+    internal string PrintPrices()
+    {
+        StringBuilder sb = new();
+        for (int i = 0; i < prices.Count; i++)
+        {
+            sb.AppendLine(prices[i].ToString());
+
+        }
+        return sb.ToString();
     }
 
     /// <summary>
@@ -69,20 +83,26 @@ internal class ElectricityMeter
     /// <param name="price">Cena za jednotku.</param>
     /// <param name="interval">Interval účtování poplatku.</param>
     /// <exception cref="NotImplementedException"></exception>
-    internal void AddTax(string name, DateOnly dateStart, DateOnly dateEnd, int price, Intervals interval)
+    public void AddTax(string name, DateOnly dateStart, DateOnly dateEnd, int price, Intervals interval)
     {
 
         taxes.Add(name, dateStart, dateEnd, price, interval);
     }
+
     /// <summary>
     /// Metoda sloužící k výpisu posledních n záznamů odečtů.
     /// </summary>
     /// <param name="n">Počet záznamů k výpisu</param>
-    internal string PrintLastReadings(int n)
+    /// <returns>String s odečty</returns>
+    public string PrintLastReadings(int n)
     {
         StringBuilder sb = new();
+        if (n < 0)
+        {
+            return string.Empty;
+        }
 
-        for (int i = 0; i < readings.NumberOfReadings; i++)
+        for (int i = readings.Count - 1; i >= 0 ; i--)
         {
             if (i >= n)
             {
@@ -93,11 +113,14 @@ internal class ElectricityMeter
         }
         return sb.ToString();
     }
-
-    internal string PrintTaxes()
+    /// <summary>
+    /// Metoda sloužící k výpisu všech poplatků.
+    /// </summary>
+    /// <returns>String s poplatky</returns>
+    public string PrintTaxes()
     {
         StringBuilder sb = new();
-        for (int i = 0; i < taxes.CountOfTaxes; i++)
+        for (int i = 0; i < taxes.Count; i++)
         {
             sb.AppendLine(taxes[i].ToString());
 
@@ -105,7 +128,7 @@ internal class ElectricityMeter
         return sb.ToString();
     }
 
-    internal string PrintCalculation()
+    public string PrintCalculation()
     {
         StringBuilder sb = new();
 
@@ -117,7 +140,7 @@ internal class ElectricityMeter
         sb.AppendLine($"{lastDateOfReading}\t|{lastGaugeState}\t|####\t|####\t|####\t|####\t|####");
 
 
-        for (int i = 1; i < readings.NumberOfReadings; i++)
+        for (int i = 1; i < readings.Count; i++)
         {
             double AVGConsumption = GetAVGConsumption(readings[i].StateOfGauge, lastGaugeState, readings[i].Date, lastDateOfReading);
             sb.AppendLine(

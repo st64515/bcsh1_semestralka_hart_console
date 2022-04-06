@@ -1,7 +1,7 @@
-﻿namespace ElectricityMeterLibrary;
+﻿namespace EnergyConsumptionLibrary;
 internal class DatabaseOfTaxes
 {
-    public int CountOfTaxes => taxes_list.Count;
+    public int Count => taxes_list.Count;
     private readonly List<Tax> taxes_list = new();
 
     public Tax this[int index]

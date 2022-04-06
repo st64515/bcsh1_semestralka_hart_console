@@ -1,4 +1,4 @@
-﻿namespace ElectricityMeterLibrary;
+﻿namespace EnergyConsumptionLibrary;
 public class Tax
 {
     public Tax(string name, DateOnly dateStart, DateOnly dateEnd, int price, Intervals interval)
