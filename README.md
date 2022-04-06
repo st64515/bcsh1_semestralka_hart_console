@@ -20,7 +20,7 @@ Rozpracovaná verze. V budoucnu bude aplikace splňovat výše uvedené funkce. 
 	- Struktura zpracování dat v aplikaci
 	- Validace vkládaných hodnot a případné vystavení výjimek
 	- Všechny potřebné třídy
-	- Aplikace je zatím v konzolové verzi, bez UI. 
+	- Aplikace je zatím v konzolové verzi s UI. 
 ### Chyby, kterých si jsem vědom:
 	- Kontorla překrývajících se intervalů cen v některých případech nefunguje.
 	- Cena musí být číslo s desetinnou čárkou.
